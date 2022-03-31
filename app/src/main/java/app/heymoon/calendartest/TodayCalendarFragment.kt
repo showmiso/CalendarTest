@@ -38,6 +38,10 @@ class TodayCalendarFragment : Fragment(), CalendarAdapter.OnItemClickListener {
     }
 
     private fun initUi() {
+        binding.tvCalendar.setOnClickListener {
+            binding.rcvCalendar.smoothScrollToPosition(5)
+        }
+        // recyclerview
         val adapter = CalendarAdapter(this)
         binding.rcvCalendar.adapter = adapter
         binding.rcvCalendar.layoutManager = StaggeredGridLayoutManager(6, StaggeredGridLayoutManager.HORIZONTAL)
