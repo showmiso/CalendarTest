@@ -10,7 +10,7 @@ class CalendarAdapter(
 ) : RecyclerView.Adapter<CalendarAdapter.CalendarWeekViewHolder>() {
 
     private var toggle = false
-    private var checkedPosition = Int.MIN_VALUE
+    private var checkedPosition = 0
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CalendarWeekViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -44,13 +44,22 @@ class CalendarAdapter(
                 if (checkedPosition != Int.MIN_VALUE) {
                     notifyItemChanged(checkedPosition)
                 }
-                checkedPosition = layoutPosition
-                notifyItemChanged(checkedPosition)
+                if (checkedPosition == layoutPosition) {
+                    checkedPosition = Int.MIN_VALUE
+                } else {
+                    checkedPosition = layoutPosition
+                    notifyItemChanged(checkedPosition)
+                }
             }
         }
     }
 
+    fun getCheckedPosition(): Int {
+        return checkedPosition
+    }
+
     interface OnItemClickListener {
         fun onItemClick(toggle: Boolean)
+        fun onItemCheckedChanged(checkedPosition: Int)
     }
 }

@@ -1,11 +1,15 @@
 package app.heymoon.calendartest
 
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.core.animation.doOnEnd
+import androidx.core.animation.doOnStart
+import androidx.core.content.ContextCompat
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
@@ -23,7 +27,7 @@ import java.time.LocalDate
 import java.time.YearMonth
 import java.time.temporal.WeekFields
 
-class TodayCalendarFragment : Fragment(), CalendarAdapter.OnItemClickListener {
+class TodayCalendarFragment : Fragment() {
 
     private var _binding: FragmentTodayCalendarBinding? = null
     private val binding get() = _binding!!
@@ -58,7 +62,7 @@ class TodayCalendarFragment : Fragment(), CalendarAdapter.OnItemClickListener {
 //            return@setOnTouchListener detectorCompat.onTouchEvent(motionEvent)
 //        }
         // recyclerview
-        val adapter = CalendarAdapter(this)
+        val adapter = CalendarAdapter(onCalendarListener)
         binding.rcvCalendar.adapter = adapter
         binding.rcvCalendar.layoutManager =
             StaggeredGridLayoutManager(6, StaggeredGridLayoutManager.HORIZONTAL)
@@ -70,36 +74,72 @@ class TodayCalendarFragment : Fragment(), CalendarAdapter.OnItemClickListener {
     }
 
     private fun updateRecyclerViewHeight(isChecked: Boolean) {
-        val startValue = 200
-        val endValue = 700
+        // change height
+        val itemHeight = resources.getDimension(R.dimen.height_week_item)
+        val startValue = itemHeight.toInt()
+        val endValue = startValue * 6
         val animator = if (isChecked) {
             ValueAnimator.ofInt(startValue, endValue)
         } else {
             ValueAnimator.ofInt(endValue, startValue)
         }
         animator.addUpdateListener { animator ->
-            binding.rcvCalendar.updateLayoutParams {
+            binding.layoutOverRecyclerview.updateLayoutParams {
                 height = animator.animatedValue as Int
             }
         }
         animator.doOnEnd {
+            endOfAnimation(isChecked)
+        }
+        animator.doOnStart {
             if (isChecked) {
-                binding.rcvCalendar.layoutManager = StaggeredGridLayoutManager(6, StaggeredGridLayoutManager.HORIZONTAL)
-            } else {
-                binding.rcvCalendar.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+                endOfAnimation(isChecked)
             }
         }
-
         animator.duration = 200
-        animator.start()
+//        animator.start()
+
+        // move animation
+        val value = if (isChecked) { 0f } else { itemHeight * -1 }
+        val animator1 = ObjectAnimator.ofFloat(binding.rcvCalendar, "translationY", value)
+        animator1.doOnEnd {
+//            endOfAnimation(isChecked)
+        }
+        animator1.duration = 200
+        animator1.start()
+
+//        // animation merge test
+//        val translateY = PropertyValuesHolder.ofFloat(
+//            View.TRANSLATION_Y, value
+//        )
+//        val animator2 = ObjectAnimator.ofPropertyValuesHolder(binding.rcvCalendar, translateY)
+//        animator2.addUpdateListener {
+//            binding.rcvCalendar.updateLayoutParams {
+//                height = animator.animatedValue as Int
+//            }
+//        }
     }
 
-    override fun onItemClick(toggle: Boolean) {
+    private fun endOfAnimation(isChecked: Boolean) {
+        if (isChecked) {
+            binding.rcvCalendar.layoutManager = StaggeredGridLayoutManager(6, StaggeredGridLayoutManager.HORIZONTAL)
+        } else {
+            binding.rcvCalendar.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        }
+    }
+
+    private val onCalendarListener = object : CalendarAdapter.OnItemClickListener {
+        override fun onItemClick(toggle: Boolean) {
 //        if (toggle) {
 //            binding.rcvCalendar.layoutManager = StaggeredGridLayoutManager(6, StaggeredGridLayoutManager.HORIZONTAL)
 //        } else {
 //            binding.rcvCalendar.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 //        }
+        }
+
+        override fun onItemCheckedChanged(checkedPosition: Int) {
+
+        }
     }
 
     private val onItemTouchListener = object : RecyclerView.SimpleOnItemTouchListener() {
@@ -110,29 +150,6 @@ class TodayCalendarFragment : Fragment(), CalendarAdapter.OnItemClickListener {
     }
 
     private val onGestureListener = object : GestureDetector.SimpleOnGestureListener() {
-//        override fun onDown(p0: MotionEvent?): Boolean {
-//            Timber.i("onGestureListener onDown")
-//            return true
-//        }
-//
-//        override fun onShowPress(p0: MotionEvent?) {
-//            Timber.i("onGestureListener onShowPress")
-//        }
-//
-//        override fun onSingleTapUp(p0: MotionEvent?): Boolean {
-//            Timber.i("onGestureListener onSingleTapUp")
-//            return true
-//        }
-//
-//        override fun onScroll(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean {
-//            Timber.i("onGestureListener onScroll")
-//            return true
-//        }
-//
-//        override fun onLongPress(p0: MotionEvent?) {
-//            Timber.i("onGestureListener onScroll")
-//        }
-
         override fun onFling(e1: MotionEvent?, e2: MotionEvent?, velocityX: Float, velocityY: Float): Boolean {
             Timber.i("onGestureListener onFling")
             Log.d("test", "onGestureListener onFling $velocityX $velocityY")
