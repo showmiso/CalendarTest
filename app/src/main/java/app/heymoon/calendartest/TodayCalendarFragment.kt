@@ -1,11 +1,15 @@
 package app.heymoon.calendartest
 
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import androidx.core.animation.doOnEnd
 import androidx.core.view.GestureDetectorCompat
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -47,6 +51,9 @@ class TodayCalendarFragment : Fragment(), CalendarAdapter.OnItemClickListener {
         binding.tvCalendar.setOnClickListener {
             binding.rcvCalendar.smoothScrollToPosition(5)
         }
+        binding.switchAnimationTest.setOnCheckedChangeListener { compoundButton, isChecked ->
+            updateRecyclerViewHeight(!isChecked)
+        }
 //        binding.viewCardAll.setOnTouchListener { view, motionEvent ->
 //            return@setOnTouchListener detectorCompat.onTouchEvent(motionEvent)
 //        }
@@ -60,6 +67,31 @@ class TodayCalendarFragment : Fragment(), CalendarAdapter.OnItemClickListener {
         // recyclerview 에 gesture 를 붙여봄
         binding.rcvCalendar.addOnItemTouchListener(onItemTouchListener)
 //        createCalendar()
+    }
+
+    private fun updateRecyclerViewHeight(isChecked: Boolean) {
+        val startValue = 200
+        val endValue = 700
+        val animator = if (isChecked) {
+            ValueAnimator.ofInt(startValue, endValue)
+        } else {
+            ValueAnimator.ofInt(endValue, startValue)
+        }
+        animator.addUpdateListener { animator ->
+            binding.rcvCalendar.updateLayoutParams {
+                height = animator.animatedValue as Int
+            }
+        }
+        animator.doOnEnd {
+            if (isChecked) {
+                binding.rcvCalendar.layoutManager = StaggeredGridLayoutManager(6, StaggeredGridLayoutManager.HORIZONTAL)
+            } else {
+                binding.rcvCalendar.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+            }
+        }
+
+        animator.duration = 200
+        animator.start()
     }
 
     override fun onItemClick(toggle: Boolean) {
