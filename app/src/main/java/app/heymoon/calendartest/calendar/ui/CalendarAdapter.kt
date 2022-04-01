@@ -10,6 +10,7 @@ class CalendarAdapter(
 ) : RecyclerView.Adapter<CalendarAdapter.CalendarWeekViewHolder>() {
 
     private var toggle = false
+    private var checkedPosition = Int.MIN_VALUE
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CalendarWeekViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -34,6 +35,17 @@ class CalendarAdapter(
             binding.root.setOnClickListener {
                 toggle = !toggle
                 listener.onItemClick(toggle)
+            }
+            binding.cbtItem.isChecked = layoutPosition == checkedPosition
+            binding.cbtItem.setOnCheckedChangeListener { compoundButton, b ->
+                if (!compoundButton.isPressed) {
+                    return@setOnCheckedChangeListener
+                }
+                if (checkedPosition != Int.MIN_VALUE) {
+                    notifyItemChanged(checkedPosition)
+                }
+                checkedPosition = layoutPosition
+                notifyItemChanged(checkedPosition)
             }
         }
     }
