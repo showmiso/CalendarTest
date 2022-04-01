@@ -13,10 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.PagerSnapHelper
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import androidx.recyclerview.widget.*
 import app.heymoon.calendartest.calendar.model.CalendarDay
 import app.heymoon.calendartest.calendar.model.DayOwner
 import app.heymoon.calendartest.calendar.ui.CalendarAdapter
@@ -65,7 +62,8 @@ class TodayCalendarFragment : Fragment() {
         val adapter = CalendarAdapter(onCalendarListener)
         binding.rcvCalendar.adapter = adapter
         binding.rcvCalendar.layoutManager =
-            StaggeredGridLayoutManager(6, StaggeredGridLayoutManager.HORIZONTAL)
+            GridLayoutManager(requireContext(), 6, GridLayoutManager.HORIZONTAL, false)
+        // StaggeredGridLayoutManager(6, StaggeredGridLayoutManager.HORIZONTAL)
         val snapHelper = PagerSnapHelper()
         snapHelper.attachToRecyclerView(binding.rcvCalendar)
         // recyclerview 에 gesture 를 붙여봄
@@ -84,8 +82,12 @@ class TodayCalendarFragment : Fragment() {
             ValueAnimator.ofInt(endValue, startValue)
         }
         animator.addUpdateListener { animator ->
-            binding.layoutOverRecyclerview.updateLayoutParams {
-                height = animator.animatedValue as Int
+//            binding.layoutOverRecyclerview.updateLayoutParams {
+//                height = animator.animatedValue as Int
+//            }
+            binding.layoutOverRecyclerview.apply {
+                layoutParams.height = animator.animatedValue as Int
+                requestLayout()
             }
         }
         animator.doOnEnd {
@@ -96,8 +98,8 @@ class TodayCalendarFragment : Fragment() {
                 endOfAnimation(isChecked)
             }
         }
-        animator.duration = 200
-//        animator.start()
+        animator.duration = 1000
+        animator.start()
 
         // move animation
         val value = if (isChecked) { 0f } else { itemHeight * -1 }
@@ -105,8 +107,8 @@ class TodayCalendarFragment : Fragment() {
         animator1.doOnEnd {
 //            endOfAnimation(isChecked)
         }
-        animator1.duration = 200
-        animator1.start()
+        animator1.duration = 1000
+//        animator1.s  tart()
 
 //        // animation merge test
 //        val translateY = PropertyValuesHolder.ofFloat(
@@ -122,7 +124,8 @@ class TodayCalendarFragment : Fragment() {
 
     private fun endOfAnimation(isChecked: Boolean) {
         if (isChecked) {
-            binding.rcvCalendar.layoutManager = StaggeredGridLayoutManager(6, StaggeredGridLayoutManager.HORIZONTAL)
+            binding.rcvCalendar.layoutManager = GridLayoutManager(requireContext(), 6, GridLayoutManager.HORIZONTAL, false)
+        // StaggeredGridLayoutManager(6, StaggeredGridLayoutManager.HORIZONTAL)
         } else {
             binding.rcvCalendar.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         }
