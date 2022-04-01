@@ -41,8 +41,7 @@
             android:layout_height="56dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:background="@color/white">
+            app:layout_constraintTop_toTopOf="parent">
 
             <TextView
                 android:id="@+id/tvCalendar"
@@ -73,7 +72,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/layoutHeader"
             android:layout_height="wrap_content"
-            android:background="@color/white"
             android:orientation="horizontal">
 
             <TextView

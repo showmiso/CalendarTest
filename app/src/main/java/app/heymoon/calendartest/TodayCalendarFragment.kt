@@ -1,7 +1,6 @@
 package app.heymoon.calendartest
 
 import android.animation.ObjectAnimator
-import android.animation.PropertyValuesHolder
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -9,7 +8,6 @@ import android.util.Log
 import android.view.*
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
-import androidx.core.content.ContextCompat
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
@@ -75,19 +73,15 @@ class TodayCalendarFragment : Fragment() {
         // change height
         val itemHeight = resources.getDimension(R.dimen.height_week_item)
         val startValue = itemHeight.toInt()
-        val endValue = startValue * 6
+        val endValue = itemHeight.toInt() * 6
         val animator = if (isChecked) {
             ValueAnimator.ofInt(startValue, endValue)
         } else {
             ValueAnimator.ofInt(endValue, startValue)
         }
         animator.addUpdateListener { animator ->
-//            binding.layoutOverRecyclerview.updateLayoutParams {
-//                height = animator.animatedValue as Int
-//            }
-            binding.layoutOverRecyclerview.apply {
-                layoutParams.height = animator.animatedValue as Int
-                requestLayout()
+            binding.layoutOverRecyclerview.updateLayoutParams {
+                height = animator.animatedValue as Int
             }
         }
         animator.doOnEnd {
@@ -108,7 +102,7 @@ class TodayCalendarFragment : Fragment() {
 //            endOfAnimation(isChecked)
         }
         animator1.duration = 1000
-//        animator1.s  tart()
+//        animator1.start()
 
 //        // animation merge test
 //        val translateY = PropertyValuesHolder.ofFloat(
