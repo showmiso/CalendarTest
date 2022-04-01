@@ -1,18 +1,19 @@
 package app.heymoon.calendartest
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
+import android.view.*
+import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import app.heymoon.calendartest.calendar.model.CalendarDay
 import app.heymoon.calendartest.calendar.model.DayOwner
 import app.heymoon.calendartest.calendar.ui.CalendarAdapter
 import app.heymoon.calendartest.databinding.FragmentTodayCalendarBinding
+import timber.log.Timber
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -22,6 +23,10 @@ class TodayCalendarFragment : Fragment(), CalendarAdapter.OnItemClickListener {
 
     private var _binding: FragmentTodayCalendarBinding? = null
     private val binding get() = _binding!!
+
+    private val detectorCompat by lazy {
+        GestureDetectorCompat(requireContext(), onGestureListener)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,24 +42,69 @@ class TodayCalendarFragment : Fragment(), CalendarAdapter.OnItemClickListener {
         initUi()
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun initUi() {
         binding.tvCalendar.setOnClickListener {
             binding.rcvCalendar.smoothScrollToPosition(5)
         }
+//        binding.viewCardAll.setOnTouchListener { view, motionEvent ->
+//            return@setOnTouchListener detectorCompat.onTouchEvent(motionEvent)
+//        }
         // recyclerview
         val adapter = CalendarAdapter(this)
         binding.rcvCalendar.adapter = adapter
-        binding.rcvCalendar.layoutManager = StaggeredGridLayoutManager(6, StaggeredGridLayoutManager.HORIZONTAL)
+        binding.rcvCalendar.layoutManager =
+            StaggeredGridLayoutManager(6, StaggeredGridLayoutManager.HORIZONTAL)
         val snapHelper = PagerSnapHelper()
         snapHelper.attachToRecyclerView(binding.rcvCalendar)
+        // recyclerview 에 gesture 를 붙여봄
+        binding.rcvCalendar.addOnItemTouchListener(onItemTouchListener)
 //        createCalendar()
     }
 
     override fun onItemClick(toggle: Boolean) {
-        if (toggle) {
-            binding.rcvCalendar.layoutManager = StaggeredGridLayoutManager(6, StaggeredGridLayoutManager.HORIZONTAL)
-        } else {
-            binding.rcvCalendar.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+//        if (toggle) {
+//            binding.rcvCalendar.layoutManager = StaggeredGridLayoutManager(6, StaggeredGridLayoutManager.HORIZONTAL)
+//        } else {
+//            binding.rcvCalendar.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+//        }
+    }
+
+    private val onItemTouchListener = object : RecyclerView.SimpleOnItemTouchListener() {
+        override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+            detectorCompat.onTouchEvent(e)
+            return false
+        }
+    }
+
+    private val onGestureListener = object : GestureDetector.SimpleOnGestureListener() {
+//        override fun onDown(p0: MotionEvent?): Boolean {
+//            Timber.i("onGestureListener onDown")
+//            return true
+//        }
+//
+//        override fun onShowPress(p0: MotionEvent?) {
+//            Timber.i("onGestureListener onShowPress")
+//        }
+//
+//        override fun onSingleTapUp(p0: MotionEvent?): Boolean {
+//            Timber.i("onGestureListener onSingleTapUp")
+//            return true
+//        }
+//
+//        override fun onScroll(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean {
+//            Timber.i("onGestureListener onScroll")
+//            return true
+//        }
+//
+//        override fun onLongPress(p0: MotionEvent?) {
+//            Timber.i("onGestureListener onScroll")
+//        }
+
+        override fun onFling(e1: MotionEvent?, e2: MotionEvent?, velocityX: Float, velocityY: Float): Boolean {
+            Timber.i("onGestureListener onFling")
+            Log.d("test", "onGestureListener onFling $velocityX $velocityY")
+            return true
         }
     }
 
