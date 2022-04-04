@@ -6,12 +6,15 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.view.animation.ScaleAnimation
+import android.view.animation.TranslateAnimation
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.*
+import app.heymoon.calendartest.calendar.TopSheetGesture
 import app.heymoon.calendartest.calendar.model.CalendarDay
 import app.heymoon.calendartest.calendar.model.DayOwner
 import app.heymoon.calendartest.calendar.ui.CalendarAdapter
@@ -29,6 +32,9 @@ class TodayCalendarFragment : Fragment() {
 
     private val detectorCompat by lazy {
         GestureDetectorCompat(requireContext(), onGestureListener)
+    }
+    private val topSheetGesture by lazy {
+        TopSheetGesture(requireContext(), binding.layoutFragmentTodayCalendar)
     }
 
     override fun onCreateView(
@@ -51,7 +57,8 @@ class TodayCalendarFragment : Fragment() {
             binding.rcvCalendar.smoothScrollToPosition(5)
         }
         binding.switchAnimationTest.setOnCheckedChangeListener { compoundButton, isChecked ->
-            updateRecyclerViewHeight(!isChecked)
+//            updateRecyclerViewHeight(!isChecked)
+            updateViewAnimation()
         }
 //        binding.viewCardAll.setOnTouchListener { view, motionEvent ->
 //            return@setOnTouchListener detectorCompat.onTouchEvent(motionEvent)
@@ -66,7 +73,14 @@ class TodayCalendarFragment : Fragment() {
         snapHelper.attachToRecyclerView(binding.rcvCalendar)
         // recyclerview 에 gesture 를 붙여봄
         binding.rcvCalendar.addOnItemTouchListener(onItemTouchListener)
+//        binding.rcvCalendar.setOnTouchListener(topSheetGesture)
 //        createCalendar()
+
+        // all touch listener
+        binding.layoutFragmentTodayCalendar.apply {
+            setOnTouchListener(topSheetGesture)
+            setOnClickListener {  }
+        }
     }
 
     private fun updateRecyclerViewHeight(isChecked: Boolean) {
@@ -85,6 +99,9 @@ class TodayCalendarFragment : Fragment() {
             }
         }
         animator.doOnEnd {
+            val animator2 = ObjectAnimator.ofFloat(binding.rcvCalendar, "translationY", 0f)
+            animator2.duration = 0
+            animator2.start()
             endOfAnimation(isChecked)
         }
         animator.doOnStart {
@@ -102,7 +119,7 @@ class TodayCalendarFragment : Fragment() {
 //            endOfAnimation(isChecked)
         }
         animator1.duration = 1000
-//        animator1.start()
+        animator1.start()
 
 //        // animation merge test
 //        val translateY = PropertyValuesHolder.ofFloat(
@@ -116,6 +133,20 @@ class TodayCalendarFragment : Fragment() {
 //        }
     }
 
+    private fun updateViewAnimation() {
+        val animation = TranslateAnimation(0f, 0f, 100f, 200f)
+        animation.duration = 1000
+        binding.rcvCalendar.startAnimation(animation)
+    }
+
+    // recyclerview 에 gesture 를 붙임
+    private val onItemTouchListener = object : RecyclerView.SimpleOnItemTouchListener() {
+        override fun onInterceptTouchEvent(v: RecyclerView, event: MotionEvent): Boolean {
+            detectorCompat.onTouchEvent(event)
+            return false
+        }
+    }
+
     private fun endOfAnimation(isChecked: Boolean) {
         if (isChecked) {
             binding.rcvCalendar.layoutManager = GridLayoutManager(requireContext(), 6, GridLayoutManager.HORIZONTAL, false)
@@ -127,22 +158,14 @@ class TodayCalendarFragment : Fragment() {
 
     private val onCalendarListener = object : CalendarAdapter.OnItemClickListener {
         override fun onItemClick(toggle: Boolean) {
-//        if (toggle) {
-//            binding.rcvCalendar.layoutManager = StaggeredGridLayoutManager(6, StaggeredGridLayoutManager.HORIZONTAL)
-//        } else {
-//            binding.rcvCalendar.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-//        }
+//            if (toggle) {
+//                binding.rcvCalendar.layoutManager = StaggeredGridLayoutManager(6, StaggeredGridLayoutManager.HORIZONTAL)
+//            } else {
+//                binding.rcvCalendar.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+//            }
         }
 
         override fun onItemCheckedChanged(checkedPosition: Int) {
-
-        }
-    }
-
-    private val onItemTouchListener = object : RecyclerView.SimpleOnItemTouchListener() {
-        override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
-            detectorCompat.onTouchEvent(e)
-            return false
         }
     }
 

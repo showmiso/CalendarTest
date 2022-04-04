@@ -50,6 +50,7 @@ class CalendarAdapter(
                     checkedPosition = layoutPosition
                     notifyItemChanged(checkedPosition)
                 }
+                listener.onItemCheckedChanged(checkedPosition)
             }
         }
     }
