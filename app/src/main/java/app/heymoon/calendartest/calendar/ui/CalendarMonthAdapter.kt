@@ -4,7 +4,10 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.Transformation
 import androidx.recyclerview.widget.RecyclerView
+import app.heymoon.calendartest.R
 import app.heymoon.calendartest.databinding.ItemMonthBinding
 
 class CalendarMonthAdapter(
@@ -51,6 +54,32 @@ class CalendarMonthAdapter(
 
         override fun onClick(p0: View?) {
             onClickListener.onClickListener(adapterPosition)
+            collapse()
+        }
+
+        private fun collapse() {
+            val weekPosition = 5
+            val itemHeight = binding.root.resources.getDimension(R.dimen.height_week_item)
+            val currentHeight = itemHeight * 6
+            val targetHeight = itemHeight
+            val topHeight = itemHeight * weekPosition
+            val animation = object : Animation() {
+                override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
+                    binding.swipeScrollView.layoutParams.height = if (interpolatedTime == 1f) {
+                        targetHeight.toInt()
+                    } else {
+                        (currentHeight - ((currentHeight - targetHeight) * interpolatedTime)).toInt()
+                    }
+                    binding.swipeScrollView.requestLayout()
+
+                    if (binding.swipeScrollView.measuredHeight < topHeight + targetHeight) {
+                        val position = topHeight + targetHeight - binding.swipeScrollView.measuredHeight
+                        binding.swipeScrollView.smoothScrollTo(0, position.toInt())
+                    }
+                }
+            }
+            animation.duration = 1000
+            binding.swipeScrollView.startAnimation(animation)
         }
     }
 

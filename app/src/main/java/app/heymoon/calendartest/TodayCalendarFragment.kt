@@ -7,7 +7,9 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
+import android.view.animation.Transformation
 import android.view.animation.TranslateAnimation
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
@@ -169,10 +171,25 @@ class TodayCalendarFragment : Fragment() {
     }
 
     private fun updateViewAnimation() {
-        val animation = TranslateAnimation(0f, 0f, 100f, 200f)
-        animation.duration = 1000
-        binding.rcvCalendar.startAnimation(animation)
+//        val animation = TranslateAnimation(0f, 0f, 100f, 200f)
+//        animation.duration = 1000
+//        binding.rcvCalendar.startAnimation(animation)
     }
+
+    private fun collapse() {
+        val weekPosition = 2
+        val itemHeight = resources.getDimension(R.dimen.height_week_item)
+        val monthHeight = itemHeight * 6
+        val topHeight = itemHeight * (weekPosition + 1)
+        val animation = object : Animation() {
+            override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
+
+            }
+        }
+        animation.duration = 1000
+        animation.start()
+    }
+
 
     // recyclerview 에 gesture 를 붙임
     private val onItemTouchListener = object : RecyclerView.SimpleOnItemTouchListener() {
