@@ -3,6 +3,7 @@ package app.heymoon.calendartest
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -18,6 +19,8 @@ import app.heymoon.calendartest.calendar.TopSheetGesture
 import app.heymoon.calendartest.calendar.model.CalendarDay
 import app.heymoon.calendartest.calendar.model.DayOwner
 import app.heymoon.calendartest.calendar.ui.CalendarAdapter
+import app.heymoon.calendartest.calendar.ui.CalendarMonthAdapter
+import app.heymoon.calendartest.calendar.ui.OnSwipeTouchListener
 import app.heymoon.calendartest.databinding.FragmentTodayCalendarBinding
 import timber.log.Timber
 import java.time.DayOfWeek
@@ -33,9 +36,9 @@ class TodayCalendarFragment : Fragment() {
     private val detectorCompat by lazy {
         GestureDetectorCompat(requireContext(), onGestureListener)
     }
-    private val topSheetGesture by lazy {
-        TopSheetGesture(requireContext(), binding.layoutFragmentTodayCalendar)
-    }
+//    private val topSheetGesture by lazy {
+//        TopSheetGesture(requireContext(), binding.layoutFragmentTodayCalendar)
+//    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,10 +67,12 @@ class TodayCalendarFragment : Fragment() {
 //            return@setOnTouchListener detectorCompat.onTouchEvent(motionEvent)
 //        }
         // recyclerview
-        val adapter = CalendarAdapter(onCalendarListener)
-        binding.rcvCalendar.adapter = adapter
+//        val adapter = CalendarAdapter(onCalendarListener)
+        val monthAdapter = CalendarMonthAdapter(getSwipe(requireContext()), onMonthClickListener)
+        binding.rcvCalendar.adapter = monthAdapter
         binding.rcvCalendar.layoutManager =
-            GridLayoutManager(requireContext(), 6, GridLayoutManager.HORIZONTAL, false)
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+//            GridLayoutManager(requireContext(), 6, GridLayoutManager.HORIZONTAL, false)
         // StaggeredGridLayoutManager(6, StaggeredGridLayoutManager.HORIZONTAL)
         val snapHelper = PagerSnapHelper()
         snapHelper.attachToRecyclerView(binding.rcvCalendar)
@@ -77,9 +82,39 @@ class TodayCalendarFragment : Fragment() {
 //        createCalendar()
 
         // all touch listener
-        binding.layoutFragmentTodayCalendar.apply {
-            setOnTouchListener(topSheetGesture)
-            setOnClickListener {  }
+//        binding.layoutFragmentTodayCalendar.apply {
+//            setOnTouchListener(topSheetGesture)
+//            setOnClickListener {  }
+//        }
+    }
+
+    private fun getSwipe(context: Context) : OnSwipeTouchListener {
+        return object : OnSwipeTouchListener(context) {
+            override fun onSwipeLeft() {
+                Timber.d("onSwipeLeft")
+                Log.d("test","onSwipeLeft")
+            }
+
+            override fun onSwipeRight() {
+                Timber.d("onSwipeRight")
+                Log.d("test","onSwipeRight")
+            }
+
+            override fun onSwipeTop() {
+                Timber.d("onSwipeTop")
+                Log.d("test","onSwipeTop")
+            }
+
+            override fun onSwipeBottom() {
+                Timber.d("onSwipeBottom")
+                Log.d("test","onSwipeBottom")
+            }
+        }
+    }
+
+    private val onMonthClickListener = object : CalendarMonthAdapter.OnMonthCalendarListener {
+        override fun onClickListener(position: Int) {
+            Timber.d("")
         }
     }
 
@@ -152,7 +187,8 @@ class TodayCalendarFragment : Fragment() {
             binding.rcvCalendar.layoutManager = GridLayoutManager(requireContext(), 6, GridLayoutManager.HORIZONTAL, false)
         // StaggeredGridLayoutManager(6, StaggeredGridLayoutManager.HORIZONTAL)
         } else {
-            binding.rcvCalendar.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+            binding.rcvCalendar.layoutManager =
+                LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         }
     }
 
