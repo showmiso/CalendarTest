@@ -20,10 +20,7 @@ import androidx.recyclerview.widget.*
 import app.heymoon.calendartest.calendar.TopSheetGesture
 import app.heymoon.calendartest.calendar.model.CalendarDay
 import app.heymoon.calendartest.calendar.model.DayOwner
-import app.heymoon.calendartest.calendar.ui.CalendarAdapter
-import app.heymoon.calendartest.calendar.ui.CalendarMonthAdapter
-import app.heymoon.calendartest.calendar.ui.CalendarWeekAdapter
-import app.heymoon.calendartest.calendar.ui.OnSwipeTouchListener
+import app.heymoon.calendartest.calendar.ui.*
 import app.heymoon.calendartest.databinding.FragmentTodayCalendarBinding
 import timber.log.Timber
 import java.time.DayOfWeek
@@ -42,6 +39,10 @@ class TodayCalendarFragment : Fragment() {
 //    private val topSheetGesture by lazy {
 //        TopSheetGesture(requireContext(), binding.layoutFragmentTodayCalendar)
 //    }
+
+    private val monthAdapter by lazy {
+        CalendarMonthAdapter(onMonthClickListener)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -71,7 +72,6 @@ class TodayCalendarFragment : Fragment() {
 //        }
         // recyclerview
 //        val adapter = CalendarAdapter(onCalendarListener)
-        val monthAdapter = CalendarMonthAdapter(getSwipe(requireContext()), onMonthClickListener)
         binding.rcvCalendar.adapter = monthAdapter
         binding.rcvCalendar.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -129,12 +129,19 @@ class TodayCalendarFragment : Fragment() {
             binding.rcvWeekCalendar.scrollToPosition(translateToWeekIndex)
         }
 
-        override fun onFinishedCollapse() {
-            Log.d("test","onFinishedCollapse")
+        /**
+         * 월간에서 주간으로 갈 때
+         * collapse 가 완료되면 해당 포지션으로 이동하고 rcvWeekCalendar 를 보여준다.
+         * expand 가 시작되면 rcvWeekCalendar 를 가린다.
+         */
+        override fun onFinishedCollapse(index: Int, position: Int) {
+            val translateToWeekIndex = position * 6 + index
+            binding.rcvWeekCalendar.scrollToPosition(translateToWeekIndex)
+            binding.rcvWeekCalendar.visibility = View.VISIBLE
         }
 
-        override fun onFinishedExpand() {
-            Log.d("test","onFinishedExpand")
+        override fun onFinishedExpand(index: Int, position: Int) {
+            binding.rcvWeekCalendar.visibility = View.GONE
         }
     }
 
@@ -194,7 +201,6 @@ class TodayCalendarFragment : Fragment() {
 //        binding.rcvCalendar.startAnimation(animation)
     }
 
-
     // recyclerview 에 gesture 를 붙임
     private val onItemTouchListener = object : RecyclerView.SimpleOnItemTouchListener() {
         override fun onInterceptTouchEvent(v: RecyclerView, event: MotionEvent): Boolean {
@@ -226,11 +232,18 @@ class TodayCalendarFragment : Fragment() {
         }
     }
 
-    private val onGestureListener = object : GestureDetector.SimpleOnGestureListener() {
-        override fun onFling(e1: MotionEvent?, e2: MotionEvent?, velocityX: Float, velocityY: Float): Boolean {
-            Timber.i("onGestureListener onFling")
-            Log.d("test", "onGestureListener onFling $velocityX $velocityY")
-            return true
+    private val onGestureListener = object : OnSwipeGestureListener() {
+        override fun onSwipeTop() {
+            Timber.d("onSwipeTop")
+            Log.d("test","onSwipeTop")
+            // 월간 -> 주간
+        }
+
+        override fun onSwipeBottom() {
+            Timber.d("onSwipeBottom")
+            Log.d("test","onSwipeBottom")
+            // 주간 -> 월간
+
         }
     }
 

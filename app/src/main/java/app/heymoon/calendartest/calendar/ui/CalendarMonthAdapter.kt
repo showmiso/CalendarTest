@@ -8,14 +8,18 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.Transformation
 import android.widget.LinearLayout
+import androidx.core.animation.doOnEnd
+import androidx.core.animation.doOnStart
 import androidx.recyclerview.widget.RecyclerView
 import app.heymoon.calendartest.R
 import app.heymoon.calendartest.databinding.ItemMonthBinding
 
 class CalendarMonthAdapter(
-    private val listener: OnSwipeTouchListener,
     private val onClickListener: OnMonthCalendarListener
 ) : RecyclerView.Adapter<CalendarMonthAdapter.CalendarMonthViewHolder>() {
+
+    private var selectedPosition = 0
+    private val list = listOf<Int>(1, 2, 3, 4, 5, 6, 7)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CalendarMonthViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -28,7 +32,7 @@ class CalendarMonthAdapter(
     }
 
     override fun getItemCount(): Int {
-        return 5
+        return list.size
     }
 
     inner class CalendarMonthViewHolder(
@@ -46,8 +50,8 @@ class CalendarMonthAdapter(
             binding.tvWeek4.text = "$adapterPosition ${count++} week"
             binding.tvWeek5.text = "$adapterPosition ${count++} week"
             binding.tvWeek6.text = "$adapterPosition ${count++} week"
-            binding.swipeScrollView.setOnTouchListener(listener)
-            binding.swipeScrollView.setListener(listener)
+//            binding.swipeScrollView.setOnTouchListener(listener)
+//            binding.swipeScrollView.setListener(listener)
             binding.tvWeek1.setOnClickListener(this@CalendarMonthViewHolder)
             binding.tvWeek2.setOnClickListener(this@CalendarMonthViewHolder)
             binding.tvWeek3.setOnClickListener(this@CalendarMonthViewHolder)
@@ -71,11 +75,11 @@ class CalendarMonthAdapter(
             if (toggle) {
                 collapse(index)
             } else {
-                expand()
+                expand(index)
             }
         }
 
-        private fun collapse(index: Int) {
+        fun collapse(index: Int) {
             val weekPosition = index
             val itemHeight = binding.root.resources.getDimension(R.dimen.height_week_item)
             val currentHeight = itemHeight * 6
@@ -90,16 +94,6 @@ class CalendarMonthAdapter(
                     }
                     binding.swipeScrollView.layoutParams.height = height
                     binding.swipeScrollView.requestLayout()
-                    // 스크롤
-//                    if (height < topHeight + targetHeight) {
-//                        val position = topHeight + targetHeight - binding.swipeScrollView.measuredHeight
-//                        binding.swipeScrollView.smoothScrollTo(0, position.toInt())
-//                    }
-//                    binding.swipeScrollView.smoothScrollTo(0, topHeight.toInt())
-                    if (interpolatedTime == 1f) {
-                        // 모든 액션이 종료되었을 때 처리
-                        onClickListener.onFinishedCollapse()
-                    }
                 }
             }
             animation.duration = 1000
@@ -112,10 +106,19 @@ class CalendarMonthAdapter(
                 val value = it.animatedValue as Int
                 binding.swipeScrollView.scrollTo(0, value)
             }
+            scrollAnimation.doOnEnd {
+                // 모든 액션이 종료되었을 때 처리
+                onClickListener.onFinishedCollapse(index, adapterPosition)
+            }
             scrollAnimation.start()
+
+            /**
+             * 선택된 week 외의 다른 week 는 alpha 100 -> 0
+             * 선택된 week 는 alpha 0 -> 100
+             */
         }
 
-        private fun expand() {
+        fun expand(index: Int) {
             val itemHeight = binding.root.resources.getDimension(R.dimen.height_week_item)
             val currentHeight = itemHeight
             val targetHeight = itemHeight * 6
@@ -129,10 +132,6 @@ class CalendarMonthAdapter(
                     }
                     binding.swipeScrollView.layoutParams.height = height
                     binding.swipeScrollView.requestLayout()
-                    if (interpolatedTime == 1f) {
-                        // 모든 액션이 종료되었을 때 처리
-                        onClickListener.onFinishedExpand()
-                    }
                 }
             }
             animation.duration = 1000
@@ -146,13 +145,17 @@ class CalendarMonthAdapter(
                 val value = it.animatedValue as Int
                 binding.swipeScrollView.scrollTo(0, value)
             }
+            scrollAnimation.doOnStart {
+                // 모든 액션이 종료되었을 때 처리
+                onClickListener.onFinishedExpand(index, adapterPosition)
+            }
             scrollAnimation.start()
         }
     }
 
     interface OnMonthCalendarListener {
         fun onClickListener(index: Int, position: Int)
-        fun onFinishedCollapse()
-        fun onFinishedExpand()
+        fun onFinishedCollapse(index: Int, position: Int)
+        fun onFinishedExpand(index: Int, position: Int)
     }
 }
