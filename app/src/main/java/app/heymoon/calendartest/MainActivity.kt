@@ -20,9 +20,9 @@ class MainActivity : AppCompatActivity() {
                 .addToBackStack(null)
                 .commit()
         }
-        binding.viewFragmentBackground.setOnClickListener {
-            Timber.d("background click")
-        }
+//        binding.viewFragmentBackground.setOnClickListener {
+//            Timber.d("background click")
+//        }
     }
 
 }

@@ -243,7 +243,10 @@ class TodayCalendarFragment : Fragment() {
             Timber.d("onSwipeBottom")
             Log.d("test","onSwipeBottom")
             // 주간 -> 월간
-
+            /**
+             * 주간 캘린더 Gone 시키고 animation 시작하기?
+             * 또는 해당 위치로 이동한 다음에 Gone 시키고 위치 복구
+             */
         }
     }
 
