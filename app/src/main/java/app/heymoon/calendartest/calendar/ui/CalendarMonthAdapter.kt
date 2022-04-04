@@ -151,6 +151,37 @@ class CalendarMonthAdapter(
             }
             scrollAnimation.start()
         }
+
+        private fun selectedWeek() {
+            /**
+             * - collapse 될 때
+             * 이번 달이 아닌 day 가 있다면
+             * 서서히 보여준다.
+             * alpha 0 -> 100
+             *
+             * - expand 될 때
+             * 이번 달이 아닌 day 가 있다면
+             * 서서히 사라진다.
+             * alpha 100 -> 0
+             *
+             */
+        }
+
+        private fun notSelectedWeek() {
+            /**
+             * - collapse 될 때
+             * 이번달인 day 가
+             * 서서히 사라진다.
+             * alpha 100 -> 0
+             *
+             * - expand 될 때
+             * 이번달인 day 를
+             * 서서히 보여준다.
+             * alpha 0 -> 100 
+             *
+             */
+
+        }
     }
 
     interface OnMonthCalendarListener {
