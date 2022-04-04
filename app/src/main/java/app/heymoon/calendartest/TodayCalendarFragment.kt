@@ -118,6 +118,14 @@ class TodayCalendarFragment : Fragment() {
         override fun onClickListener(position: Int) {
             Timber.d("")
         }
+
+        override fun onFinishedCollapse() {
+            Log.d("test","onFinishedCollapse")
+        }
+
+        override fun onFinishedExpand() {
+            Log.d("test","onFinishedExpand")
+        }
     }
 
     private fun updateRecyclerViewHeight(isChecked: Boolean) {

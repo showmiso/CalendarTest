@@ -1,5 +1,6 @@
 package app.heymoon.calendartest.calendar.ui
 
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
@@ -82,49 +83,76 @@ class CalendarMonthAdapter(
             val topHeight = itemHeight * weekPosition
             val animation = object : Animation() {
                 override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
-                    binding.swipeScrollView.layoutParams.height = if (interpolatedTime == 1f) {
+                    val height = if (interpolatedTime == 1f) {
                         targetHeight.toInt()
                     } else {
                         (currentHeight - ((currentHeight - targetHeight) * interpolatedTime)).toInt()
                     }
+                    binding.swipeScrollView.layoutParams.height = height
                     binding.swipeScrollView.requestLayout()
                     // 스크롤
-                    if (binding.swipeScrollView.measuredHeight < topHeight + targetHeight) {
-                        val position = topHeight + targetHeight - binding.swipeScrollView.measuredHeight
-                        binding.swipeScrollView.smoothScrollTo(0, position.toInt())
-                    }
+//                    if (height < topHeight + targetHeight) {
+//                        val position = topHeight + targetHeight - binding.swipeScrollView.measuredHeight
+//                        binding.swipeScrollView.smoothScrollTo(0, position.toInt())
+//                    }
+//                    binding.swipeScrollView.smoothScrollTo(0, topHeight.toInt())
                     if (interpolatedTime == 1f) {
                         // 모든 액션이 종료되었을 때 처리
+                        onClickListener.onFinishedCollapse()
                     }
                 }
             }
             animation.duration = 1000
             binding.swipeScrollView.startAnimation(animation)
+
+            // scroll animation
+            val scrollAnimation = ValueAnimator.ofInt(0, topHeight.toInt())
+            scrollAnimation.duration = 1000
+            scrollAnimation.addUpdateListener {
+                val value = it.animatedValue as Int
+                binding.swipeScrollView.scrollTo(0, value)
+            }
+            scrollAnimation.start()
         }
 
         private fun expand() {
             val itemHeight = binding.root.resources.getDimension(R.dimen.height_week_item)
             val currentHeight = itemHeight
             val targetHeight = itemHeight * 6
+            val topHeight = itemHeight * 4
             val animation = object : Animation() {
                 override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
-                    binding.swipeScrollView.layoutParams.height = if (interpolatedTime == 1f) {
+                    val height = if (interpolatedTime == 1f) {
                         LinearLayout.LayoutParams.WRAP_CONTENT
                     } else {
                         (currentHeight - ((currentHeight - targetHeight) * interpolatedTime)).toInt()
                     }
+                    binding.swipeScrollView.layoutParams.height = height
                     binding.swipeScrollView.requestLayout()
                     if (interpolatedTime == 1f) {
                         // 모든 액션이 종료되었을 때 처리
+                        onClickListener.onFinishedExpand()
                     }
                 }
             }
             animation.duration = 1000
             binding.swipeScrollView.startAnimation(animation)
+
+            // scroll animation
+            // 선택한 주를 기반으로 scroll 되도록 하면 위 아래가 같이 올라갔다 온다. 
+            val scrollAnimation = ValueAnimator.ofInt(topHeight.toInt(), 0)
+            scrollAnimation.duration = 1000
+            scrollAnimation.addUpdateListener {
+                val value = it.animatedValue as Int
+                binding.swipeScrollView.scrollTo(0, value)
+            }
+            scrollAnimation.start()
         }
     }
 
     interface OnMonthCalendarListener {
         fun onClickListener(position: Int)
+        fun onFinishedCollapse()
+        fun onFinishedExpand()
     }
 }
