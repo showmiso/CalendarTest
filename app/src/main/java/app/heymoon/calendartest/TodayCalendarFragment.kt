@@ -22,6 +22,7 @@ import app.heymoon.calendartest.calendar.model.CalendarDay
 import app.heymoon.calendartest.calendar.model.DayOwner
 import app.heymoon.calendartest.calendar.ui.CalendarAdapter
 import app.heymoon.calendartest.calendar.ui.CalendarMonthAdapter
+import app.heymoon.calendartest.calendar.ui.CalendarWeekAdapter
 import app.heymoon.calendartest.calendar.ui.OnSwipeTouchListener
 import app.heymoon.calendartest.databinding.FragmentTodayCalendarBinding
 import timber.log.Timber
@@ -76,10 +77,18 @@ class TodayCalendarFragment : Fragment() {
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 //            GridLayoutManager(requireContext(), 6, GridLayoutManager.HORIZONTAL, false)
         // StaggeredGridLayoutManager(6, StaggeredGridLayoutManager.HORIZONTAL)
+        // week
+        val weekAdapter = CalendarWeekAdapter()
+        binding.rcvWeekCalendar.adapter = weekAdapter
+        binding.rcvWeekCalendar.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+
         val snapHelper = PagerSnapHelper()
         snapHelper.attachToRecyclerView(binding.rcvCalendar)
+        val snapHelper2 = PagerSnapHelper()
+        snapHelper2.attachToRecyclerView(binding.rcvWeekCalendar)
         // recyclerview 에 gesture 를 붙여봄
         binding.rcvCalendar.addOnItemTouchListener(onItemTouchListener)
+        binding.rcvWeekCalendar.addOnItemTouchListener(onItemTouchListener)
 //        binding.rcvCalendar.setOnTouchListener(topSheetGesture)
 //        createCalendar()
 
@@ -115,8 +124,9 @@ class TodayCalendarFragment : Fragment() {
     }
 
     private val onMonthClickListener = object : CalendarMonthAdapter.OnMonthCalendarListener {
-        override fun onClickListener(position: Int) {
-            Timber.d("")
+        override fun onClickListener(index: Int, position: Int) {
+            val translateToWeekIndex = position * 6 + index
+            binding.rcvWeekCalendar.scrollToPosition(translateToWeekIndex)
         }
 
         override fun onFinishedCollapse() {
@@ -182,20 +192,6 @@ class TodayCalendarFragment : Fragment() {
 //        val animation = TranslateAnimation(0f, 0f, 100f, 200f)
 //        animation.duration = 1000
 //        binding.rcvCalendar.startAnimation(animation)
-    }
-
-    private fun collapse() {
-        val weekPosition = 2
-        val itemHeight = resources.getDimension(R.dimen.height_week_item)
-        val monthHeight = itemHeight * 6
-        val topHeight = itemHeight * (weekPosition + 1)
-        val animation = object : Animation() {
-            override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
-
-            }
-        }
-        animation.duration = 1000
-        animation.start()
     }
 
 

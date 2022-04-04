@@ -40,12 +40,12 @@ class CalendarMonthAdapter(
         @SuppressLint("ClickableViewAccessibility")
         fun bind() {
             var count = 0
-            binding.tvWeek1.text = "$adapterPosition${++count} week"
-            binding.tvWeek2.text = "$adapterPosition${++count} week"
-            binding.tvWeek3.text = "$adapterPosition${++count} week"
-            binding.tvWeek4.text = "$adapterPosition${++count} week"
-            binding.tvWeek5.text = "$adapterPosition${++count} week"
-            binding.tvWeek6.text = "$adapterPosition${++count} week"
+            binding.tvWeek1.text = "$adapterPosition ${count++} week"
+            binding.tvWeek2.text = "$adapterPosition ${count++} week"
+            binding.tvWeek3.text = "$adapterPosition ${count++} week"
+            binding.tvWeek4.text = "$adapterPosition ${count++} week"
+            binding.tvWeek5.text = "$adapterPosition ${count++} week"
+            binding.tvWeek6.text = "$adapterPosition ${count++} week"
             binding.swipeScrollView.setOnTouchListener(listener)
             binding.swipeScrollView.setListener(listener)
             binding.tvWeek1.setOnClickListener(this@CalendarMonthViewHolder)
@@ -66,7 +66,7 @@ class CalendarMonthAdapter(
                 binding.tvWeek6.id -> 5
                 else -> 0
             }
-            onClickListener.onClickListener(adapterPosition)
+            onClickListener.onClickListener(index, adapterPosition)
             toggle = !toggle
             if (toggle) {
                 collapse(index)
@@ -139,7 +139,7 @@ class CalendarMonthAdapter(
             binding.swipeScrollView.startAnimation(animation)
 
             // scroll animation
-            // 선택한 주를 기반으로 scroll 되도록 하면 위 아래가 같이 올라갔다 온다. 
+            // 선택한 주를 기반으로 scroll 되도록 하면 위 아래가 같이 올라갔다 온다.
             val scrollAnimation = ValueAnimator.ofInt(topHeight.toInt(), 0)
             scrollAnimation.duration = 1000
             scrollAnimation.addUpdateListener {
@@ -151,7 +151,7 @@ class CalendarMonthAdapter(
     }
 
     interface OnMonthCalendarListener {
-        fun onClickListener(position: Int)
+        fun onClickListener(index: Int, position: Int)
         fun onFinishedCollapse()
         fun onFinishedExpand()
     }
