@@ -2,6 +2,7 @@ package app.heymoon.calendartest.calendar.ui
 
 import android.view.GestureDetector
 import android.view.MotionEvent
+import android.view.View
 import kotlin.math.abs
 
 abstract class OnSwipeGestureListener : GestureDetector.SimpleOnGestureListener() {

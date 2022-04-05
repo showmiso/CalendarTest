@@ -18,6 +18,7 @@ import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.*
 import app.heymoon.calendartest.calendar.TopSheetGesture
+import app.heymoon.calendartest.calendar.TopSheetGestureForUnderbar
 import app.heymoon.calendartest.calendar.model.CalendarDay
 import app.heymoon.calendartest.calendar.model.DayOwner
 import app.heymoon.calendartest.calendar.ui.*
@@ -36,9 +37,9 @@ class TodayCalendarFragment : Fragment() {
     private val detectorCompat by lazy {
         GestureDetectorCompat(requireContext(), onGestureListener)
     }
-//    private val topSheetGesture by lazy {
-//        TopSheetGesture(requireContext(), binding.layoutFragmentTodayCalendar)
-//    }
+    private val topSheetGesture by lazy {
+        TopSheetGesture(requireContext(), binding.layoutFragmentTodayCalendar)
+    }
 
     private val monthAdapter by lazy {
         CalendarMonthAdapter(onMonthClickListener)
@@ -60,13 +61,13 @@ class TodayCalendarFragment : Fragment() {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun initUi() {
-        binding.tvCalendar.setOnClickListener {
-            binding.rcvCalendar.smoothScrollToPosition(5)
-        }
-        binding.switchAnimationTest.setOnCheckedChangeListener { compoundButton, isChecked ->
-//            updateRecyclerViewHeight(!isChecked)
-            updateViewAnimation()
-        }
+//        binding.tvCalendar.setOnClickListener {
+//            binding.rcvCalendar.smoothScrollToPosition(5)
+//        }
+//        binding.switchAnimationTest.setOnCheckedChangeListener { compoundButton, isChecked ->
+////            updateRecyclerViewHeight(!isChecked)
+//            updateViewAnimation()
+//        }
 //        binding.viewCardAll.setOnTouchListener { view, motionEvent ->
 //            return@setOnTouchListener detectorCompat.onTouchEvent(motionEvent)
 //        }
@@ -93,9 +94,10 @@ class TodayCalendarFragment : Fragment() {
 //        createCalendar()
 
         // all touch listener
+        // underbar 에도 touchlistener 를 입힐 수 있으나 값은 모두 따로 설정해야 한다.
 //        binding.layoutFragmentTodayCalendar.apply {
 //            setOnTouchListener(topSheetGesture)
-//            setOnClickListener {  }
+//            setOnClickListener { }
 //        }
     }
 
@@ -137,7 +139,7 @@ class TodayCalendarFragment : Fragment() {
         override fun onFinishedCollapse(index: Int, position: Int) {
             val translateToWeekIndex = position * 6 + index
             binding.rcvWeekCalendar.scrollToPosition(translateToWeekIndex)
-            binding.rcvWeekCalendar.visibility = View.VISIBLE
+//            binding.rcvWeekCalendar.visibility = View.VISIBLE
         }
 
         override fun onFinishedExpand(index: Int, position: Int) {
@@ -205,6 +207,13 @@ class TodayCalendarFragment : Fragment() {
     private val onItemTouchListener = object : RecyclerView.SimpleOnItemTouchListener() {
         override fun onInterceptTouchEvent(v: RecyclerView, event: MotionEvent): Boolean {
             detectorCompat.onTouchEvent(event)
+            return false
+        }
+    }
+
+    private val onItemTouchListener2 = object : RecyclerView.SimpleOnItemTouchListener() {
+        override fun onInterceptTouchEvent(v: RecyclerView, event: MotionEvent): Boolean {
+            topSheetGesture.onTouch(v, event)
             return false
         }
     }

@@ -3,6 +3,7 @@ package app.heymoon.calendartest.calendar.ui
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
@@ -13,6 +14,7 @@ import androidx.core.animation.doOnStart
 import androidx.recyclerview.widget.RecyclerView
 import app.heymoon.calendartest.R
 import app.heymoon.calendartest.databinding.ItemMonthBinding
+import timber.log.Timber
 
 class CalendarMonthAdapter(
     private val onClickListener: OnMonthCalendarListener
@@ -20,6 +22,9 @@ class CalendarMonthAdapter(
 
     private var selectedPosition = 0
     private val list = listOf<Int>(1, 2, 3, 4, 5, 6, 7)
+    private var moveY = 0f
+    private var eventRawY = 0f
+    private var lastY = 0f
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CalendarMonthViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -58,6 +63,23 @@ class CalendarMonthAdapter(
             binding.tvWeek4.setOnClickListener(this@CalendarMonthViewHolder)
             binding.tvWeek5.setOnClickListener(this@CalendarMonthViewHolder)
             binding.tvWeek6.setOnClickListener(this@CalendarMonthViewHolder)
+//            binding.viewOverlay.setOnTouchListener { v  , event ->
+//                when (event.action) {
+//                    MotionEvent.ACTION_DOWN -> {
+//                        moveY = v.y - event.rawY
+//                        lastY = event.rawY
+//                    }
+//                    MotionEvent.ACTION_MOVE -> {
+//                        eventRawY = event.rawY
+//                        val targetY = eventRawY + moveY
+//                        binding.viewAll.animate()
+//                            .y(targetY)
+//                            .setDuration(0)
+//                            .start()
+//                    }
+//                }
+//                return@setOnTouchListener false
+//            }
         }
 
         override fun onClick(view: View) {

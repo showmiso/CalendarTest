@@ -2,6 +2,7 @@ package app.heymoon.calendartest
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import app.heymoon.calendartest.calendar.TopSheetGesture
 import app.heymoon.calendartest.databinding.ActivityMainBinding
 import timber.log.Timber
 
@@ -9,6 +10,9 @@ class MainActivity : AppCompatActivity() {
 
     private val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
+    }
+    private val topSheetGesture by lazy {
+        TopSheetGesture(this, binding.fragmentCalendar)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,6 +26,11 @@ class MainActivity : AppCompatActivity() {
         }
 //        binding.viewFragmentBackground.setOnClickListener {
 //            Timber.d("background click")
+//        }
+
+//        binding.fragmentCalendar.apply {
+//            setOnTouchListener(topSheetGesture)
+//            setOnClickListener { }
 //        }
     }
 
